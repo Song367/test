@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <style>
+        .header{margin:20px 0 0 20px;width: 100px;background-color: burlywood}
+        .left{width: 200px;background-color: orange;margin-left:20px; margin-top: 80px;float: left}
+        p{list-style: none;margin-top: 20px;}
+        .right{width: 600px;background-color: darkgray;float: left;}
+        thead,tbody,td,th{border: 2px solid orange}
+        table{display: none}
+        .addcourse{float: left;font-size: 15px;display: none}
+        .course{margin-left: 20px;display: none}
+        .fengeleft{margin-left: 20px;background-color: burlywood;width: 100px;float: left}
+        .fengeright{margin-left: 40px;background-color: burlywood;width: 180px;float: left}
+        .mydelete{margin-left: 40px;background-color: burlywood;width: 70px;float: left}
+        .fengeleft2{margin-left: 20px;background-color: burlywood;width: 100px;float: left}
+        .fengeright2{margin-left: 40px;background-color: burlywood;width: 180px;float: left}
+        .myadd{margin-left: 40px;background-color: burlywood;width: 70px;float: left;}
+        .myadd p{font-size: 20px;height: 20px;background-color: orange;text-align: center}
+    </style>
+    <script src="/static/js/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+    <div class="header">
+
+    </div>
+    <div class="left">
+
+            <p id="p1">查看或修改我的信息</p>
+            <p id="p2">显示、删除我的选课</p>
+            <p id="p3">查看、添加可选课程</p>
+
+    </div>
+    <div class="right">
+        <table>
+            <thead>
+                <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>性别</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="t1">1713033064</td>
+                    <td id="t2">宋居成</td>
+                    <td id="t3">男</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="course">
+            <div class="fengeleft">
+                <label>课程id</label>
+                <span></span>
+            </div>
+            <div class="fengeright">
+                <label>课程名</label>
+                <span></span>
+            </div>
+            <div class="mydelete">
+                <label>删除课程</label>
+                <span></span>
+            </div>
+        </div>
+        <div class="addcourse">
+            <div class="fengeleft2">
+                <label>课程id</label>
+                <span></span>
+            </div>
+            <div class="fengeright2">
+                <label>课程名</label>
+                <span></span>
+            </div>
+            <div class="myadd">
+                <label>&emsp;</label>
+                <span></span>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    $('.header').html(sessionStorage.getItem('name'));
+    //查看自己的用户信息
+    $('#p1').click(function () {
+        $('.course').hide();
+        $('.addcourse').hide();
+        $('table').show();
+        $.ajax({
+            url:'/stu/getdata/',
+            type:'POST',
+            data:{name:sessionStorage.getItem('name')},
+            success:function (data) {
+                console.log(data);
+                data=data['data'];
+
+                for (var i=0;i<data.length;i++) {
+                    datas = data[i];
+                    if (datas['name'] === sessionStorage.getItem('name')) {
+                        $('#t1').text(datas['id']);
+                        $('#t2').text(datas['name']);
+                        $('#t3').text(datas['sex']);
+                    }
+                }
+            }
+        })
+    });
+    //点击查看自己的选课信息
+    $('#p2').click(function () {
+        $('table').hide();
+        $('.addcourse').hide();
+        $('.course').show();
+
+        $.ajax({
+            url: '/stu/getdatastudent/',
+            type: 'POST',
+            data:{'name':sessionStorage.getItem('name')},
+            success:function (data) {
+                data=data['course'];
+                console.log(data);
+                $('.fengeleft span').html('');
+                $('.fengeright span').html('');
+                $('.mydelete span').html('');
+                for (var i=0;i<data.length;i++) {
+                    var d1=[];
+                    var d2=[];
+                    var d3=[];
+                    d1 +='<p>' + data[i]['cid'] + '</p>';
+                    d2 +='<p>' + data[i]['name'] + '</p>';
+                    d3 +='<p>删除</p>';
+                    $('.fengeleft span').append(d1);
+                    $('.fengeright span').append(d2);
+                    $('.mydelete span').append(d3);
+                }
+                datas=data;
+                $('.mydelete span').children().click(function (event) {
+                    index=$(this).index();
+                    console.log(datas[index]);
+                    $.ajax({
+                        url:'/stu/data_3/',
+                        type:'POST',
+                        data:{courses:datas[index],name:sessionStorage.getItem('name')},
+                        success:function (data) {
+
+                        }
+                    })
+                });
+            }
+        });
+    });
+    //点击查看按钮，显示查看信息，以及添加课程
+    $('#p3').click(function () {
+        $('table').hide();
+        $('.course').hide();
+        $('.addcourse').show();
+        $.ajax({
+            url:'/stu/getdata',
+            type:'GET',
+            success:function (data) {
+                console.log(data);
+                var stu=data['students'];
+                console.log(stu);
+                var stuid=0;
+                for(var j=0;j<stu.length;j++){
+                    if (stu[j]['name']===sessionStorage.getItem('name')) {
+
+                        stuid=stu[j]["id_id"];
+                        console.log(stuid)
+                    }
+                }
+
+
+                data=data['course'];
+                $('.fengeleft2 span').html('');
+                $('.fengeright2 span').html('');
+                $('.myadd span').html('');
+                for (var i=0;i<data.length;i++){
+                    var d1=[];
+                    var d2=[];
+                    var d3=[];
+                    d1 +='<p>' + data[i]['cid'] + '</p>';
+                    d2 +='<p>' + data[i]['name'] + '</p>';
+                    d3 +='<p>+</p>';
+                    $('.fengeleft2 span').append(d1);
+                    $('.fengeright2 span').append(d2);
+                    $('.myadd span').append(d3);
+                }
+                $('.myadd p').click(function () {
+                    console.log(data[$(this).index()]['cid']);
+                    var adddata=data[$(this).index()]['cid']; //这是显示点击对应添加的数据
+
+                    $.ajax({
+                        url:'/stu/addcourse/',
+                        type:'POST',
+                        data:{cid:adddata,stu_id:stuid},
+                        success:function (data) {
+
+                        }
+                    })
+                })
+            }
+        })
+    })
+
+</script>
+</html>

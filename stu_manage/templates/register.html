@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册学生</title>
+    <script src="/static/js/jquery-3.4.1.min.js"></script>
+    <style>
+        div{width: 300px;margin: 100px auto;}
+        input{width: 100%;height: 40px;border-radius: 5px;border: none;background-color: darkgray;margin-top: 10px;text-align: center}
+        .login{width: 60px;height:40px ;margin: 20px 120px;display: inline-block;border-radius: 2px}
+        select{width: 100%;height: 40px;margin-top: 10px;background-color: darkgray;text-align: center;font-family: '楷体';text-align-last: center;font-size: 18px;}
+        option{text-align-last: center}
+    </style>
+</head>
+<body>
+<div>
+    <input type="text" name="id" placeholder="学号">
+    <input type="text" name="username" placeholder="用户名">
+    <select>
+        <option>男</option>
+        <option>女</option>
+    </select>
+    <input type="password" name="passwd" placeholder="密码">
+    <input class="login" type="button" value="注册" id="p1">
+</div>
+</body>
+    <script>
+        $('#p1').click(function () {
+            var name2=$('[name=username]').val();
+            var pwd=$('[name=passwd]').val();
+            var sex1=$('select').val();
+            var id1=$('[name=id]').val();
+            console.log(name2,sex1,pwd);
+
+            $.ajax({
+                url:'/stu/reg/',
+                type:'POST',
+                data:{name:name2,password:pwd,sex:sex1,id:id1},
+                success:function (data) {
+                    if(data!=null){
+                        location.href='/stu/login/';
+                    }
+                }
+            })
+
+
+        })
+    </script>
+</html>
